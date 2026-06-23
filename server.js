@@ -1,6 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+const fs = require('fs');
 const path = require('path');
 const Stripe = require('stripe');
 const db = require('./db');
@@ -82,6 +83,17 @@ app.use(express.static(path.join(__dirname)));
 
 app.get('/en/offers/united-states/millennium-hotel-broadway-times-square/fifa-2026/index.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'en/offers/united-states/millennium-hotel-broadway-times-square/fifa-2026/index.html'));
+});
+
+app.get('/en/offers/*', (req, res, next) => {
+  const relativePath = req.path.replace(/^\/+/, '');
+  const filePath = path.join(__dirname, relativePath);
+
+  if (fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
+    return res.sendFile(filePath);
+  }
+
+  next();
 });
 
 app.get('/', (req, res) => {
