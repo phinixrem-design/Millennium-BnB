@@ -80,7 +80,15 @@ app.use(express.urlencoded({ extended: true }));
 // Serve static files from the repository root (e.g. for /en/offers/...)
 app.use(express.static(path.join(__dirname)));
 
+app.get('/en/offers/united-states/millennium-hotel-broadway-times-square/fifa-2026/index.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'en/offers/united-states/millennium-hotel-broadway-times-square/fifa-2026/index.html'));
+});
+
 app.get('/', (req, res) => {
+  res.redirect('/en/offers/united-states/millennium-hotel-broadway-times-square/fifa-2026/index.html');
+});
+
+app.get('/en/offers/united-states/millennium-hotel-broadway-times-square/fifa-2026', (req, res) => {
   res.redirect('/en/offers/united-states/millennium-hotel-broadway-times-square/fifa-2026/index.html');
 });
 
