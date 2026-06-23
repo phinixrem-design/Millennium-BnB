@@ -80,6 +80,14 @@ app.use(express.urlencoded({ extended: true }));
 // Serve static files from the repository root (e.g. for /en/offers/...)
 app.use(express.static(path.join(__dirname)));
 
+app.get('/', (req, res) => {
+  res.redirect('/en/offers/united-states/millennium-hotel-broadway-times-square/fifa-2026/index.html');
+});
+
+app.get('/health', (req, res) => {
+  res.json({ status: 'ok' });
+});
+
 /**
  * 2. CONFIG ENDPOINT
  * Exposes public client IDs for payment SDKs to the frontend dynamically.

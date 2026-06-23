@@ -6,21 +6,22 @@
       "use": "@vercel/node"
     }
   ],
-  "redirects": [
-    {
-      "source": "/",
-      "destination": "/en/offers/united-states/millennium-hotel-broadway-times-square/fifa-2026/index.html",
-      "permanent": false
-    }
-  ],
   "routes": [
     {
       "src": "/api/(.*)",
       "dest": "server.js"
     },
     {
+      "src": "/(.*\\.(?:css|js|png|jpg|jpeg|gif|svg|ico|json|html))",
+      "dest": "/$1"
+    },
+    {
+      "src": "/",
+      "dest": "/en/offers/united-states/millennium-hotel-broadway-times-square/fifa-2026/index.html"
+    },
+    {
       "src": "/(.*)",
-      "dest": "$1"
+      "dest": "/en/offers/united-states/millennium-hotel-broadway-times-square/fifa-2026/index.html"
     }
   ]
 }
