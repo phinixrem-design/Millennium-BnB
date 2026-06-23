@@ -85,7 +85,7 @@ app.get('/en/offers/united-states/millennium-hotel-broadway-times-square/fifa-20
   res.sendFile(path.join(__dirname, 'en/offers/united-states/millennium-hotel-broadway-times-square/fifa-2026/index.html'));
 });
 
-app.get('/en/offers/*', (req, res, next) => {
+app.get('/en/offers/united-states/millennium-hotel-broadway-times-square/fifa-2026/*', (req, res, next) => {
   const relativePath = req.path.replace(/^\/+/, '');
   const filePath = path.join(__dirname, relativePath);
 
