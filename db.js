@@ -1,11 +1,17 @@
 const fs = require('fs');
 const path = require('path');
 
-const DB_FILE = path.join(__dirname, 'reservations.json');
+const DB_FILE = process.env.VERCEL
+  ? path.join('/tmp', 'reservations.json')
+  : path.join(__dirname, 'reservations.json');
 
 // Initialize database file
 if (!fs.existsSync(DB_FILE)) {
-  fs.writeFileSync(DB_FILE, JSON.stringify([], null, 2));
+  try {
+    fs.writeFileSync(DB_FILE, JSON.stringify([], null, 2));
+  } catch (err) {
+    console.error('Error initializing DB file:', err);
+  }
 }
 
 function getReservations() {
