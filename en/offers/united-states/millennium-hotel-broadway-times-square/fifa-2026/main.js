@@ -210,8 +210,11 @@ function setDefaultDates() {
   checkout.value = formatDate(outDate);
 
   checkin.min = formatDate(today);
-  
-  checkin.addEventListener('change', () => {
+  const defaultMinCheckout = new Date(inDate);
+  defaultMinCheckout.setDate(defaultMinCheckout.getDate() + 1);
+  checkout.min = formatDate(defaultMinCheckout);
+
+  const syncCheckoutMinimum = () => {
     const checkinDate = parseLocalDate(checkin.value);
     const minOut = new Date(checkinDate);
     minOut.setDate(minOut.getDate() + 1);
@@ -222,7 +225,10 @@ function setDefaultDates() {
       adjusted.setDate(adjusted.getDate() + 3);
       checkout.value = formatDate(adjusted);
     }
-  });
+  };
+
+  checkin.addEventListener('change', syncCheckoutMinimum);
+  checkout.addEventListener('change', syncCheckoutMinimum);
 }
 
 function formatDate(d) {
@@ -488,6 +494,15 @@ function initRoomCustomizer() {
    ========================================================================== */
 
 let paypalButtonsRendered = false;
+let currentPaymentBreakdown = null;
+
+const CHECKOUT_FEES = {
+  facilityFeePerNight: 40,
+  salesTaxRate: 0.08875,
+  occupancyTaxRate: 0.05875,
+  localRoomFeePerRoomNight: 3.50,
+  incidentalHoldPerNight: 100
+};
 
 function initPaymentSystem() {
   // Customizer Booking Button click
@@ -532,6 +547,11 @@ function initPaymentSystem() {
         form.reportValidity();
         return;
       }
+
+      if (!areCheckoutPoliciesAccepted()) {
+        showStatusMessage('Please accept the booking policies before continuing.', 'error');
+        return;
+      }
       
       payWithStripeBtn.disabled = true;
       showStatusMessage('Redirecting to secure credit card checkout...', 'info');
@@ -560,14 +580,24 @@ function initPaymentSystem() {
       }
     });
   }
+
+  const termsCheckbox = document.getElementById('accept-terms');
+  if (termsCheckbox) {
+    termsCheckbox.addEventListener('change', updatePaymentGateState);
+  }
 }
 
 function openPaymentModal() {
   const bookingData = getBookingData();
+  const breakdown = calculateCheckoutBreakdown(bookingData);
+  currentPaymentBreakdown = breakdown;
   
   // Fill summary details
   document.getElementById('modal-room-name').textContent = bookingData.roomName;
+  document.getElementById('modal-room-size').textContent = bookingData.roomSize;
+  document.getElementById('modal-room-occupancy').textContent = `Max Occupancy: ${bookingData.maxOccupancy}`;
   document.getElementById('modal-booking-dates').textContent = `${bookingData.checkin} to ${bookingData.checkout}`;
+  document.getElementById('modal-nights').textContent = String(breakdown.nights);
   
   // Format add-ons
   const addonsText = bookingData.addons.length > 0 
@@ -575,7 +605,12 @@ function openPaymentModal() {
     : 'None';
   document.getElementById('modal-addons').textContent = addonsText;
   
-  document.getElementById('modal-total-price').textContent = `$${bookingData.totalPrice.toFixed(2)}`;
+  document.getElementById('modal-package-subtotal').textContent = formatCurrency(breakdown.packageSubtotal);
+  document.getElementById('modal-facility-fee').textContent = formatCurrency(breakdown.facilityFee);
+  document.getElementById('modal-taxes').textContent = formatCurrency(breakdown.estimatedTaxes);
+  document.getElementById('modal-local-fees').textContent = formatCurrency(breakdown.localRoomFees);
+  document.getElementById('modal-total-price').textContent = formatCurrency(breakdown.totalDueToday);
+  document.getElementById('modal-incidental-hold').textContent = `A temporary hold of ${formatCurrency(breakdown.incidentalHold)} (${formatCurrency(CHECKOUT_FEES.incidentalHoldPerNight)}/night) will be placed on your card at check-in for incidentals, released within 3-5 business days after checkout.`;
   
   // Open modal
   const modal = document.getElementById('paymentModal');
@@ -588,12 +623,12 @@ function openPaymentModal() {
   const alertEl = document.getElementById('payment-status-message');
   if (alertEl) alertEl.style.display = 'none';
   
-  // Enable Stripe button
-  const stripeBtn = document.getElementById('payWithStripeBtn');
-  if (stripeBtn) stripeBtn.disabled = false;
+  const termsCheckbox = document.getElementById('accept-terms');
+  if (termsCheckbox) termsCheckbox.checked = false;
+  updatePaymentGateState();
 
   // Initialize/refresh PayPal buttons
-  initPayPalButtons(bookingData.totalPrice, getBookingData);
+  initPayPalButtons(breakdown.totalDueToday, getBookingData);
 }
 
 function closeModal(modalId) {
@@ -632,6 +667,8 @@ function getBookingData() {
   const activeRoomCard = document.querySelector('.room-select-card.active');
   const roomId = activeRoomCard?.dataset.room || 'standard';
   const roomName = activeRoomCard?.querySelector('h3')?.textContent || 'Standard Room, 1 King Bed';
+  const roomSize = activeRoomCard?.dataset.size || '237 sq ft';
+  const maxOccupancy = activeRoomCard?.dataset.occupancy || '2';
   
   // Find selected add-ons
   const checkboxes = document.querySelectorAll('.addon-checkbox');
@@ -639,10 +676,10 @@ function getBookingData() {
     .filter(cb => cb.checked)
     .map(cb => cb.dataset.addon);
   
-  // Total Price
+  // Package subtotal before checkout taxes and facility/local fees
   const totalEl = document.getElementById('summary-total');
   const totalText = totalEl?.textContent || '0';
-  const totalPrice = parseFloat(totalText.replace(/[^0-9.]/g, '')) || 0;
+  const packageSubtotal = parseFloat(totalText.replace(/[^0-9.]/g, '')) || 0;
   
   // Guest details form inputs
   const guestName = document.getElementById('guest-name')?.value || '';
@@ -655,9 +692,67 @@ function getBookingData() {
     checkout: checkoutVal,
     roomId,
     roomName,
+    roomSize,
+    maxOccupancy,
     addons,
-    totalPrice
+    packageSubtotal,
+    totalPrice: currentPaymentBreakdown?.totalDueToday || packageSubtotal
   };
+}
+
+function calculateCheckoutBreakdown(bookingData) {
+  const nights = getStayNights(bookingData.checkin, bookingData.checkout);
+  const roomsCount = parseInt(document.getElementById('rooms')?.value || '1', 10);
+  const packageSubtotal = bookingData.packageSubtotal || bookingData.totalPrice || 0;
+  const facilityFee = CHECKOUT_FEES.facilityFeePerNight * nights * roomsCount;
+  const taxableSubtotal = packageSubtotal + facilityFee;
+  const estimatedTaxes = taxableSubtotal * (CHECKOUT_FEES.salesTaxRate + CHECKOUT_FEES.occupancyTaxRate);
+  const localRoomFees = CHECKOUT_FEES.localRoomFeePerRoomNight * nights * roomsCount;
+  const totalDueToday = packageSubtotal + facilityFee + estimatedTaxes + localRoomFees;
+  const incidentalHold = CHECKOUT_FEES.incidentalHoldPerNight * nights * roomsCount;
+
+  return {
+    nights,
+    packageSubtotal,
+    facilityFee,
+    estimatedTaxes,
+    localRoomFees,
+    totalDueToday,
+    incidentalHold
+  };
+}
+
+function getStayNights(checkin, checkout) {
+  if (!checkin || !checkout) return 3;
+  const start = parseLocalDate(checkin);
+  const end = parseLocalDate(checkout);
+  const diff = end.getTime() - start.getTime();
+  if (isNaN(diff) || diff <= 0) return 1;
+  return Math.max(1, Math.ceil(diff / (1000 * 60 * 60 * 24)));
+}
+
+function formatCurrency(value) {
+  return `$${Number(value || 0).toFixed(2)}`;
+}
+
+function areCheckoutPoliciesAccepted() {
+  return Boolean(document.getElementById('accept-terms')?.checked);
+}
+
+function updatePaymentGateState() {
+  const accepted = areCheckoutPoliciesAccepted();
+  const stripeBtn = document.getElementById('payWithStripeBtn');
+  const paypalContainer = document.querySelector('.paypal-method-container');
+
+  if (stripeBtn) {
+    stripeBtn.disabled = !accepted;
+    stripeBtn.setAttribute('aria-disabled', String(!accepted));
+  }
+
+  if (paypalContainer) {
+    paypalContainer.classList.toggle('is-disabled', !accepted);
+    paypalContainer.setAttribute('aria-disabled', String(!accepted));
+  }
 }
 
 async function initPayPalButtons(totalPrice, getBookingData) {
@@ -708,6 +803,10 @@ function renderPayPalButtons(totalPrice, getBookingData) {
       const form = document.getElementById('paymentDetailsForm');
       if (!form.checkValidity()) {
         form.reportValidity();
+        return actions.reject();
+      }
+      if (!areCheckoutPoliciesAccepted()) {
+        showStatusMessage('Please accept the booking policies before continuing.', 'error');
         return actions.reject();
       }
       return actions.resolve();

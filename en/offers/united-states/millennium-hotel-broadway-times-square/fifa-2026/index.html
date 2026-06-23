@@ -482,7 +482,7 @@
       <div class="room-selector-wizard">
         <div class="room-selector-cards">
           <!-- Room Card 1 (Selected by default) -->
-          <div class="room-select-card active" data-room="standard" data-base-price="280">
+          <div class="room-select-card active" data-room="standard" data-base-price="280" data-size="22 sq m / 237 sq ft" data-occupancy="2">
             <div class="room-select-badge">Selected</div>
             <img src="assets/images/room-standard.jpg" alt="Standard Room — Millennium Broadway Times Square">
             <div class="room-select-body">
@@ -499,7 +499,7 @@
           </div>
           
           <!-- Room Card 2 -->
-          <div class="room-select-card" data-room="deluxe" data-base-price="350">
+          <div class="room-select-card" data-room="deluxe" data-base-price="350" data-size="33 sq m / 355 sq ft" data-occupancy="4">
             <div class="room-select-badge">Selected</div>
             <img src="assets/images/room-deluxe.jpg" alt="Deluxe Room — Millennium Broadway Times Square">
             <div class="room-select-body">
@@ -516,7 +516,7 @@
           </div>
           
           <!-- Room Card 3 -->
-          <div class="room-select-card" data-room="premier" data-base-price="420">
+          <div class="room-select-card" data-room="premier" data-base-price="420" data-size="33 sq m / 355 sq ft" data-occupancy="4">
             <div class="room-select-badge">Selected</div>
             <img src="assets/images/room-premier.jpg" alt="Premier Room — Millennium Broadway Times Square">
             <div class="room-select-body">
@@ -777,18 +777,48 @@
               <span>Room:</span>
               <strong id="modal-room-name">Standard Room</strong>
             </div>
+            <div class="room-trust-badges" aria-label="Room details">
+              <span id="modal-room-size">237 sq ft</span>
+              <span id="modal-room-occupancy">Max Occupancy: 2</span>
+            </div>
             <div class="summary-detail-row">
               <span>Dates:</span>
               <strong id="modal-booking-dates">Dates</strong>
             </div>
             <div class="summary-detail-row">
+              <span>Nights:</span>
+              <strong id="modal-nights">3</strong>
+            </div>
+            <div class="summary-detail-row">
               <span>Add-ons:</span>
               <strong id="modal-addons">None</strong>
             </div>
+            <div class="summary-detail-row">
+              <span>Package subtotal:</span>
+              <strong id="modal-package-subtotal">$0.00</strong>
+            </div>
+            <div class="summary-detail-row">
+              <span>Facility fee:</span>
+              <strong id="modal-facility-fee">$0.00</strong>
+            </div>
+            <div class="summary-detail-row">
+              <span>Estimated NYC taxes:</span>
+              <strong id="modal-taxes">$0.00</strong>
+            </div>
+            <div class="summary-detail-row">
+              <span>Local room fees:</span>
+              <strong id="modal-local-fees">$0.00</strong>
+            </div>
             <div class="summary-detail-row summary-total-row">
-              <span>Total Price:</span>
+              <span>Estimated total due today:</span>
               <strong id="modal-total-price">$0.00</strong>
             </div>
+            <p class="fee-disclosure">
+              Includes estimated 8.875% NY state/city sales tax, estimated NYC hotel occupancy tax, local per-room nightly fees, and a $40/night facility fee for Wi-Fi, streaming, and guest services.
+            </p>
+            <p class="incidental-notice" id="modal-incidental-hold">
+              A temporary hold of $100/night will be placed on your card at check-in for incidentals, released within 3-5 business days after checkout.
+            </p>
           </div>
         </div>
 
@@ -810,6 +840,16 @@
         <!-- Payment Options -->
         <div class="payment-methods-section">
           <h3 class="payment-methods-title">Choose Payment Method</h3>
+
+          <div class="policy-container">
+            <p><strong>Cancellation Policy:</strong> Bookings are fully refundable up to 48 hours prior to check-in. No-shows and late cancellations may incur a one-night fee.</p>
+            <p><strong>Check-In Rules:</strong> Check-in begins at 4:00 PM. Checkout is 11:00 AM. Minimum age to register is 18.</p>
+            <p><strong>Property Policy:</strong> 100% smoke-free property. Smoking violations carry a $400 deep-cleaning fee. Pets must be declared before arrival and may require approval.</p>
+            <label class="policy-checkbox" for="accept-terms">
+              <input type="checkbox" id="accept-terms" required>
+              <span>I agree to the booking policies, check-in terms, cancellation policy, and incidental hold notice.</span>
+            </label>
+          </div>
           
           <div class="payment-methods-grid">
             <!-- Stripe Option -->
@@ -823,6 +863,21 @@
             <div class="paypal-method-container">
               <div id="paypal-button-container"></div>
             </div>
+          </div>
+
+          <div class="accepted-cards" aria-label="Accepted cards">
+            <span class="card-brand card-brand--visa" aria-label="Visa">
+              <svg viewBox="0 0 64 40" role="img"><rect width="64" height="40" rx="6"></rect><text x="32" y="25" text-anchor="middle">VISA</text></svg>
+            </span>
+            <span class="card-brand card-brand--mastercard" aria-label="Mastercard">
+              <svg viewBox="0 0 64 40" role="img"><rect width="64" height="40" rx="6"></rect><circle cx="26" cy="20" r="10"></circle><circle cx="38" cy="20" r="10"></circle><text x="32" y="34" text-anchor="middle">MC</text></svg>
+            </span>
+            <span class="card-brand card-brand--amex" aria-label="American Express">
+              <svg viewBox="0 0 64 40" role="img"><rect width="64" height="40" rx="6"></rect><text x="32" y="24" text-anchor="middle">AMEX</text></svg>
+            </span>
+            <span class="card-brand card-brand--discover" aria-label="Discover">
+              <svg viewBox="0 0 64 40" role="img"><rect width="64" height="40" rx="6"></rect><text x="32" y="24" text-anchor="middle">DISC</text></svg>
+            </span>
           </div>
 
           <!-- Checkout status indicators -->

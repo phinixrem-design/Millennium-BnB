@@ -2237,6 +2237,26 @@ address {
   font-weight: 600;
 }
 
+.room-trust-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: -0.25rem;
+}
+
+.room-trust-badges span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 0.35rem 0.6rem;
+  border-radius: 4px;
+  background: var(--white);
+  border: 1px solid rgba(10, 25, 48, 0.08);
+  color: var(--navy);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
 .summary-total-row {
   border-top: 1px dashed rgba(10, 25, 48, 0.12);
   padding-top: 0.75rem;
@@ -2255,6 +2275,23 @@ address {
   font-size: 1.5rem;
   color: var(--fifa-green);
   font-weight: 800;
+}
+
+.fee-disclosure,
+.incidental-notice {
+  font-size: 0.75rem;
+  line-height: 1.5;
+  color: var(--text-muted);
+  background: var(--white);
+  border: 1px solid rgba(10, 25, 48, 0.08);
+  border-radius: 6px;
+  padding: 0.75rem;
+}
+
+.incidental-notice {
+  border-color: rgba(184, 146, 42, 0.25);
+  background: rgba(184, 146, 42, 0.06);
+  color: var(--text-dark);
 }
 
 /* Guest details form */
@@ -2326,6 +2363,45 @@ address {
   margin-bottom: 1.25rem;
 }
 
+.policy-container {
+  display: grid;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+  padding: 1rem;
+  border: 1px solid rgba(10, 25, 48, 0.08);
+  border-radius: 8px;
+  background: var(--bg-light);
+}
+
+.policy-container p {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.8125rem;
+  line-height: 1.5;
+}
+
+.policy-container strong {
+  color: var(--navy);
+}
+
+.policy-checkbox {
+  display: grid;
+  grid-template-columns: 18px 1fr;
+  gap: 0.625rem;
+  align-items: start;
+  cursor: pointer;
+  color: var(--text-dark);
+  font-size: 0.8125rem;
+  line-height: 1.45;
+}
+
+.policy-checkbox input {
+  width: 18px;
+  height: 18px;
+  margin: 0.125rem 0 0;
+  accent-color: var(--gold);
+}
+
 .payment-methods-grid {
   display: grid;
   grid-template-columns: 1fr;
@@ -2361,6 +2437,20 @@ address {
   background: rgba(99, 91, 255, 0.03);
   transform: translateY(-2px);
   box-shadow: var(--shadow-md);
+}
+
+.payment-method-btn:disabled,
+.payment-method-btn[aria-disabled="true"] {
+  cursor: not-allowed;
+  opacity: 0.55;
+  transform: none;
+  box-shadow: none;
+}
+
+.payment-method-btn:disabled:hover,
+.payment-method-btn[aria-disabled="true"]:hover {
+  border-color: rgba(10, 25, 48, 0.15);
+  background: var(--white);
 }
 
 .payment-method-icon {
@@ -2412,6 +2502,87 @@ address {
   background: rgba(0, 112, 186, 0.02);
   transform: translateY(-2px);
   box-shadow: var(--shadow-md);
+}
+
+.paypal-method-container.is-disabled {
+  opacity: 0.55;
+  pointer-events: none;
+  filter: grayscale(0.2);
+}
+
+.accepted-cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+  margin: -0.25rem 0 1.5rem;
+}
+
+.card-brand {
+  display: inline-flex;
+  width: 50px;
+  height: 32px;
+}
+
+.card-brand svg {
+  width: 100%;
+  height: 100%;
+}
+
+.card-brand rect {
+  stroke: rgba(10, 25, 48, 0.12);
+  stroke-width: 1;
+}
+
+.card-brand text {
+  font-family: Arial, sans-serif;
+  font-weight: 800;
+  font-size: 12px;
+}
+
+.card-brand--visa rect,
+.card-brand--amex rect {
+  fill: #fff;
+}
+
+.card-brand--visa text {
+  fill: #1a1f71;
+}
+
+.card-brand--mastercard rect {
+  fill: #fff;
+}
+
+.card-brand--mastercard circle:first-of-type {
+  fill: #eb001b;
+}
+
+.card-brand--mastercard circle:last-of-type {
+  fill: #f79e1b;
+  opacity: 0.9;
+}
+
+.card-brand--mastercard text {
+  fill: #333;
+  font-size: 8px;
+}
+
+.card-brand--amex rect {
+  fill: #2e77bb;
+}
+
+.card-brand--amex text {
+  fill: #fff;
+  font-size: 11px;
+}
+
+.card-brand--discover rect {
+  fill: #fff;
+}
+
+.card-brand--discover text {
+  fill: #f58220;
+  font-size: 10px;
 }
 
 /* Loading overlays or alerts */

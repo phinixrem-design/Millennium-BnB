@@ -4,3 +4,5 @@ reservations.json
 .vscode/
 .system_generated/
 *.log
+
+.vercel
