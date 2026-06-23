@@ -6,6 +6,13 @@
       "use": "@vercel/node"
     }
   ],
+  "redirects": [
+    {
+      "source": "/",
+      "destination": "/en/offers/united-states/millennium-hotel-broadway-times-square/fifa-2026/index.html",
+      "permanent": false
+    }
+  ],
   "routes": [
     {
       "src": "/api/(.*)",
